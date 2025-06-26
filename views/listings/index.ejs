@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>All Listings</title>
-</head>
+<%layout("/layouts/boilerplate")%>
 <body>
   <h1>All Listings</h1>
-  <form method="GET" action="/listings/new">
+  <!-- <form method="GET" action="/listings/new">
     <button>Create new Listing</button>
-  </form>
+  </form> -->
   <ul>
     <% for (let listing of allListings) { %>
       <li>
@@ -16,4 +12,4 @@
     <% } %>
   </ul>
 </body>
-</html>
+

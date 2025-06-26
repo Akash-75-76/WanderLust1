@@ -9,6 +9,9 @@ app.set("views",path.join(__dirname,"views"));
 app.use(express.urlencoded({extended:true}));
 const methodOverride=require("method-override");
 app.use(methodOverride("_method"));
+const ejsMate=require("ejs-mate");
+app.engine('ejs',ejsMate);
+app.use(express.static(path.join(__dirname,"/public")));
 async function main() {
   await mongoose.connect(MONGO_URL);
 }
