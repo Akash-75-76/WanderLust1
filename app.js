@@ -14,6 +14,7 @@ app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError=require("./utils/ExpressError.js")
+const {listingSchema}=require("./schema.js")
 async function main() {
   await mongoose.connect(MONGO_URL);
 }
@@ -53,8 +54,9 @@ app.get("/listings/:id", async (req, res) => {
 app.post(
   "/listings",
   wrapAsync(async (req, res, next) => {
-    if(!req.body.listing){
-      throw new ExpressError(400,"Send valid data for listing");
+    let result=listingSchema.validate(req.body);
+    if(result.error){
+      throw  new ExpressError(400,result.error);
     }
     const newListings = new Listing(req.body.listing);
     await newListings.save();
