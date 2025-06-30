@@ -14,7 +14,8 @@ app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError=require("./utils/ExpressError.js")
-const {listingSchema}=require("./schema.js")
+const {listingSchema,reviewSchema}=require("./schema.js")
+const Review = require("./models/review.js");
 async function main() {
   await mongoose.connect(MONGO_URL);
 }
@@ -46,7 +47,7 @@ app.get("/listings/new", (req, res) => {
 //Show route
 app.get("/listings/:id", async (req, res) => {
   let { id } = req.params;
-  const listing = await Listing.findById(id);
+  const listing = await Listing.findById(id).populate("reviews");
   res.render("listings/show.ejs", { listing });
 });
 
@@ -93,6 +94,32 @@ app.use((err, req, res, next) => {
 });
 
 
+
+
+
+//Reviews
+//Post Route
+
+app.post("/listings/:id/reviews",wrapAsync(async(req,res)=>{
+    let listing=await Listing.findById(req.params.id);
+    let newReview=new Review(req.body.review);
+
+    listing.reviews.push(newReview);
+
+    await newReview.save();
+    await listing.save();
+    res.redirect(`/listings/${listing._id}`);
+
+}))
+
+//Delete review 
+
+app.delete("/listings/:id/reviews/:reviewId", wrapAsync(async (req, res) => {
+  const { id, reviewId } = req.params;
+  await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+  await Review.findByIdAndDelete(reviewId);
+  res.redirect(`/listings/${id}`);
+}));
 
 
 app.listen(8080, () => {
