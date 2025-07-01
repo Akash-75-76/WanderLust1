@@ -3,7 +3,7 @@ const router=express.Router();
 const wrapAsync=require("../utils/wrapAsync.js");
 const {listingSchema,reviewSchema}=require("../schema.js");
 const Listing=require("../models/listing.js")
-
+const ExpressError=require("../utils/ExpressError.js")
 //index route
 router.get("/", async (req, res) => {
   const allListings = await Listing.find({});
@@ -33,6 +33,7 @@ router.post(
     }
     const newListings = new Listing(req.body.listing);
     await newListings.save();
+    req.flash("success","New Listing created")
     res.redirect("/listings");
   })
 );
