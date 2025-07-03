@@ -6,19 +6,15 @@ const Listing = require("../models/listing.js");
 const ExpressError = require("../utils/ExpressError.js");
 const { isLoggedIn, isOwner } = require("../middleware.js");
 const listingControllers = require("../controllers/listings.js");
-const multer=require('multer');
-const {storage}=require("../cloudConfig.js")
-const upload=multer({storage});
+const multer = require("multer");
+const { storage } = require("../cloudConfig.js");
+const upload = multer({ storage });
 // INDEX & CREATE
-router
-  .route("/")
-  .get(wrapAsync(listingControllers.index))
-  .post(
-    isLoggedIn,
-    upload.single("listing[image]"), // 'image' is the name from your form input
-    wrapAsync(listingControllers.createListing)
-  );
-
+router.route("/").get(wrapAsync(listingControllers.index)).post(
+  isLoggedIn,
+  upload.single("listing[image]"), // 'image' is the name from your form input
+  wrapAsync(listingControllers.createListing)
+);
 
 // NEW FORM
 router.get("/new", isLoggedIn, listingControllers.renderNewForm);
@@ -27,7 +23,7 @@ router.get("/new", isLoggedIn, listingControllers.renderNewForm);
 router
   .route("/:id")
   .get(wrapAsync(listingControllers.showListing))
-  .put(isLoggedIn, isOwner, listingControllers.updateListing)
+  .put(isLoggedIn, isOwner,upload.single("listing[image]"), listingControllers.updateListing)
   .delete(isLoggedIn, isOwner, listingControllers.destroyListing);
 
 // EDIT FORM
