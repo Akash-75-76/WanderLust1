@@ -6,7 +6,6 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const Listing = require("./models/listing.js");
-const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 const path = require("path");
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -24,8 +23,11 @@ const flash=require("connect-flash");
 const passport=require("passport");
 const LocalStrategy=require("passport-local");
 const User=require("./models/user.js")
+const MongoStore=require('connect-mongo')
+
+const dbUrl=process.env.ATLAS_URL;
 async function main() {
-  await mongoose.connect(MONGO_URL);
+  await mongoose.connect(dbUrl);
 }
 
 main()
@@ -36,8 +38,20 @@ main()
     console.log(err);
   });
 
+  const store=MongoStore.create({
+  mongoUrl:dbUrl,
+  crypto:{
+    secret:process.env.SECRET,
+  },
+  touchAfter:24*3600,
+})
+
+store.on("error",()=>{
+  console.log("Error in Mongo Session Store",err);
+})
 const sessionOptions = {
-  secret: "mysupersecretecode", 
+  store,
+ secret:process.env.SECRET,
   resave: false,
   saveUninitialized: true,
   cookie:{
@@ -45,6 +59,7 @@ const sessionOptions = {
     maxAge:7 * 24 * 60 * 60 *1000
   }
 };
+
 
 
 app.use(session(sessionOptions));
