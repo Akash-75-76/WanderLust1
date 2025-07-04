@@ -39,20 +39,23 @@ module.exports.createListing = async (req, res, next) => {
       limit: 1,
     })
     .send();
-  console.log(response.body);
-  res.send("done!");
-  let url = req.file.path;
-  let filename = req.file.filename;
-  let result = listingSchema.validate(req.body);
-  if (result.error) {
-    throw new ExpressError(400, result.error);
-  }
-  const newListings = new Listing(req.body.listing);
-  newListings.owner = req.user._id;
-  newListings.image = { url, filename };
-  await newListings.save();
-  req.flash("success", "New Listing created");
-  res.redirect("/listings");
+  
+ let url = req.file.path;
+let filename = req.file.filename;
+// Validate the listing data
+let result = listingSchema.validate(req.body);
+if (result.error) {
+  throw new ExpressError(400, result.error);
+}
+const newListing = new Listing(req.body.listing);
+newListing.owner = req.user._id;
+newListing.image = { url, filename };
+newListing.geometry = response.body.features[0].geometry;
+let savedListing = await newListing.save();
+console.log(savedListing);
+req.flash("success", "New Listing created");
+res.redirect("/listings");
+
 };
 
 module.exports.renderEditForm = async (req, res) => {
