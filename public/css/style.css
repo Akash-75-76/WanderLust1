@@ -249,3 +249,16 @@ body {
     gap: 5px;
   }
 }
+
+
+@media (max-width: 576px) {
+  .main-heading {
+    font-size: 1.2rem;
+    margin-top: 4rem;
+    text-align: center;
+  }
+
+  .navbar {
+    flex-direction: column;
+  }
+}
