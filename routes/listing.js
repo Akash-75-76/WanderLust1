@@ -16,6 +16,10 @@ router.route("/").get(wrapAsync(listingControllers.index)).post(
   wrapAsync(listingControllers.createListing)
 );
 
+router.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
 // NEW FORM
 router.get("/new", isLoggedIn, listingControllers.renderNewForm);
 
